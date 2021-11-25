@@ -1,0 +1,54 @@
+{% extends 'main/layout.html' %}
+
+{% block title %}Поиск - {{ searchName }}{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="sub-header">
+            <h1>Результаты поиска "{{ searchName }}"</h1>
+            <p>Результатов: {{ products|length }} (показано {{ products|length }})</p>
+        </div>
+
+        <div class="filter-products-container clearfix">
+            <div class="filter-column">
+                <div class="filter-categories">
+                    <b style="font-size: 24px">Категории</b>
+                </div>
+                <div class="filter-brands"></div>
+                <div class="filter-rating"></div>
+                <div class="filter-price"></div>
+            </div>
+
+            <div class="product-panel">
+                <table class="product-table">
+                    <tr class="product-row table-header">
+                        <th class="product-info cell-name">Название</th>
+                        <td class="product-info cell-price">Цена</td>
+                        <th class="product-info cell-rating">Рейтинг</th>
+                        <th class="product-info cell-review">Количество отзывов</th>
+                        <th class="product-info cell-link">Ссылка</th>
+                    </tr>
+
+                    {% for dict_item in products %}
+                            <tr class="product-row">
+                                <td class="product-info cell-name">{{ dict_item.name }}</td>
+                                <td class="product-info cell-price">₽{{ dict_item.price }}</td>
+                                <td class="product-info cell-rating">{{ dict_item.rating }}/5</td>
+                                <td class="product-info cell-review">{{ dict_item.reviews }}</td>
+                                <td class="product-info cell-link">
+                                    <a href="{{ dict_item.link }}" target="_blank">Перейти по ссылке</a>
+                                    <div class="tooltip">
+                                        <button class="fas fa-copy fa-lg" onclick="copyText(this)" value="{{ dict_item.link }}">
+                                            <span class="tooltip-text" id="myTooltip{{ dict_item.index }}">Скопировать ссылку</span>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                    {% endfor %}
+
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
