@@ -14,7 +14,7 @@ class ProductsSearching:
     def return_products(self):
         best_products = self.get_best_products()
         if best_products is None:
-            return False
+            return None
         else:
             products_list = list(best_products.items())
             result = []

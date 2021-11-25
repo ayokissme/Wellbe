@@ -1,0 +1,18 @@
+{% extends 'main/layout.html' %}
+
+{% block title %}Поиск - {{ searchName }}{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="no-results">
+            <h1 class="header__no-result">
+                Не удается найти элементы, соответствующие запросу: <br>
+                "{{ searchName }}"
+            </h1>
+            <p class="text__no-result">
+                Проверьте правильность написания или попробуйте использовать более общие термины.
+            </p>
+        </div>
+    </div>
+{% endblock %}
+{% block footer %}footer-main{% endblock %}

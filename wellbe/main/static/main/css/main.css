@@ -244,6 +244,33 @@ input:focus::placeholder {
     clear: both;
 }
 
+/* No-results page */
+.no-results {
+    height: 300px;
+    width: 70%;
+    margin: 100px auto;
+}
+
+.header__no-result {
+    font-size: 26px;
+    line-height: 35px;
+    text-align: center;
+}
+
+.header__no-result::after {
+    content: "";
+    display: block;
+    width: 80px;
+    height: 2px;
+    margin: 20px auto;
+
+    background-color: #b9b9b9;
+}
+
+.text__no-result {
+    text-align: center;
+}
+
 /* Footer */
 .footer {
     width: 100%;
