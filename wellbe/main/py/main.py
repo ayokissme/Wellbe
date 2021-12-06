@@ -2,19 +2,10 @@ from searching_algorithm import ProductsSearching
 import pandas as pd
 import os
 
-# ProductsSearching('комплекс витаминов для мужчин')
+# ProductsSearching("YumV's,бузина,витамины C и D,тройная защита,ягодный вкус,25 мкг (1000 МЕ),60 жевательных мармеладок").return_products()
 # ProductsSearching('муsdagadfgfsAAGDHFSGтамины')
-p =ProductsSearching('витамины для детей').return_products()
-print()
-for e in p:
-    if e['name'] == "YumV's,бузина,витамины C и D,тройная защита,ягодный вкус,25 мкг (1000 МЕ),60 жевательных мармеладок":
-        print(e)
-    if e['name'] == "Natural Factors,Big Friends,жевательный витамин D3,ягодный вкус,10 мкг,250 жевательных таблеток":
-        print(e)
-        # for key, value in e.items():
-        #     print(key, "__ : __", value)
+(ProductsSearching('витамины для детей').return_products())
 # ProductsSearching('мультивитамины для детей')
-#
 # ProductsSearching('Pure Essence')
 # ProductsSearching('витамины для женщин')
 

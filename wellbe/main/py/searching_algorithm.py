@@ -18,16 +18,49 @@ class ProductsSearching:
         else:
             products_list = list(best_products.items())
             result = []
+            categories = []
+            brands = []
             for product in products_list:
                 product_info = df.loc[product[0]]
+                product_category = []
+                prod_shape = product_info.shape
+
+                """ Вывод продуктов с одинаковыми именами """
+                if prod_shape[0] > 1 and len(prod_shape) > 1:
+                    # print(prod_shape)
+                    continue
+
+                try:
+                    product_category = product_info['category'].replace(', ', '_').split(',')
+                    [categories.append(e.replace('_', ', ')) for e in product_category if e.replace('_', ', ') not in categories]
+                    product_category = [e.replace('_', ', ') for e in product_category]
+                except Exception:
+                    pass
+                try:
+                    brand = product_info['brand']
+                    if brand not in brands:
+                        brands.append(brand)
+                except Exception:
+                    pass
+
                 result.append({
                     'name': product[0],
                     'price': product_info['price'],
                     'rating': product_info['rating'],
                     'reviews': product_info['reviews_count'],
                     'link': product_info['link'],
+                    'category': product_category,
+                    'brand': product_info['brand'],
                 })
-            return result
+            return result, categories, brands
+
+    @staticmethod
+    def is_digit(string):
+        try:
+            float(string)
+            return True
+        except ValueError:
+            return False
 
     def get_best_products(self):
         df_info = self.__filter_database()

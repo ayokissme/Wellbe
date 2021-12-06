@@ -13,6 +13,16 @@ body, h1, h2, h3, h4, h5, h6 {
     max-width: 1430px;
 }
 
+.clearfix {
+    display: block;
+}
+
+.clearfix::after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
 /* Header */
 .header {
     margin-bottom: 30px;
@@ -71,9 +81,9 @@ form {
 .header__search input {
     width: 100%;
     height: 40px;
-    padding-left: 10px;
-    border: 2px solid #7BA7AB;
-    border-radius: 5px;
+    padding-left: 15px;
+    border: 3px solid #000;
+    border-radius: 15px;
     outline: none;
     font-size: 17px;
 }
@@ -89,8 +99,8 @@ input:focus::placeholder {
     width: 40px;
     height: 40px;
     border: none;
-    background: #7BA7AB;
-    border-radius: 0 5px 5px 0;
+    border-collapse: collapse;
+    background: none;
     cursor: pointer;
 }
 
@@ -227,21 +237,94 @@ input:focus::placeholder {
 /* Filter */
 .filter-column {
     float: left;
-    border-right: 1px solid #b7b7b7;
-    padding: 10px 10px 10px 0;
+    padding: 10px 0;
     min-height: 400px;
     height: auto;
     width: 17%;
 }
 
-.clearfix {
-    display: block;
+.filter-section {
+    padding-bottom: 10px;
 }
 
-.clearfix::after {
-    content: "";
-    display: table;
-    clear: both;
+.filter-list {
+    padding: 0;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    height: 300px;
+}
+
+.filter-item {
+    margin-bottom: 10px;
+    height: 20px;
+    list-style: none;
+}
+
+.filter-item label {
+    position: relative;
+    display: block;
+    height: 100%;
+    cursor: pointer;
+}
+
+.filter-item input {
+    cursor: pointer;
+}
+
+.item-text {
+    position: relative;
+    top: -18px;
+    left: 25px;
+    margin-right: 35px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.filter-item input {
+    visibility: hidden;
+}
+
+/* Checkmark */
+.checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 20px;
+  width: 20px;
+    border: 1px solid rgba(133, 133, 133, 0.25);
+    border-radius: 20%;
+  background-color: #fff;
+}
+
+.filter-item label:hover input ~ .checkmark {
+  background-color: rgba(204, 204, 204, 0.5);
+}
+
+.filter-item input:checked ~ .checkmark {
+  background-color: #A3D0C3;
+}
+
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+.filter-item input:checked ~ .checkmark:after {
+  display: block;
+}
+
+.filter-item .checkmark:after {
+  left: 7px;
+  top: 2px;
+  width: 7px;
+  height: 12px;
+  border: solid white;
+  border-width: 0 3px 3px 0;
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg);
 }
 
 /* No-results page */
