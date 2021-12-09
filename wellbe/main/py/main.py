@@ -4,13 +4,15 @@ import os
 
 # ProductsSearching("YumV's,бузина,витамины C и D,тройная защита,ягодный вкус,25 мкг (1000 МЕ),60 жевательных мармеладок").return_products()
 # ProductsSearching('муsdagadfgfsAAGDHFSGтамины')
-(ProductsSearching('витамины для детей').return_products())
+# (ProductsSearching('витамины для детей').return_products())
 # ProductsSearching('мультивитамины для детей')
 # ProductsSearching('Pure Essence')
 # ProductsSearching('витамины для женщин')
 
-# df.set_index('name', inplace=True)
-# print(df.loc['Zhou Nutrition,K2 + D3,клубника,60 жевательных таблеток']['category'].split('\n'))
+d = {'col1': [1, 2], 'col2': [3, 4]}
+
+df = pd.DataFrame(data=d).to_csv('new.csv')
+print(df)
 
 
 # def create_csv():

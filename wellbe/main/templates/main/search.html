@@ -9,28 +9,51 @@
             <p>Результатов: {{ products|length }} (показано {{ products|length }})</p>
         </div>
 
-        <div class="filter-products-container clearfix">
+        <div class="filter-products-container">
             <div class="filter-column">
+                <div class="filter-section">
+                    <h1 style="font-size: 24px">Цена</h1>
+                    <div class="price-range">
+                        <input class="price-input" placeholder="от 0" type="text" maxlength="6">
+                        <input class="price-input" placeholder="до 20000" type="text" maxlength="6">
+                    </div>
+                </div>
                 <div class="filter-section">
                     <h1 style="font-size: 24px">Категории</h1>
                     <ul class="filter-list">
                         {% for e in categories %}
                             <li class="filter-item">
-                                <label for="Filter{{ e }}">
-                                    <input id="Filter{{ e }}" type="checkbox" >
+                                <label for="Filter{{ e.0 }}">
+                                    <input class="cardCheckBox" id="Filter{{ e.0 }}" type="checkbox" value="{{ e.0 }}">
                                     <span class="checkmark"></span>
-                                    <div class="item-text" title="{{ e }}">{{ e }}</div>
+                                    <div class="item-text" title="{{ e.0 }}" data-count="{{ e.1 }}">{{ e.0 }}</div>
                                 </label>
                             </li>
                         {% endfor %}
                     </ul>
                 </div>
-                <div class="filter-brands"></div>
-                <div class="filter-rating"></div>
-                <div class="filter-price"></div>
+                <div class="filter-section">
+                    <h1 style="font-size: 24px">Бренды</h1>
+                    <ul class="filter-list">
+                        {% for e in brands %}
+                            <li class="filter-item">
+                                <label for="Filter{{ e.0 }}">
+                                    <input class="cardCheckBox2" id="Filter{{ e.0 }}" type="checkbox" value="{{ e.0 }}">
+                                    <span class="checkmark"></span>
+                                    <div class="item-text" title="{{ e.0 }}" data-count="{{ e.1 }}">{{ e.0 }}</div>
+                                </label>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class="filter-section"></div>
             </div>
 
             <div class="product-panel">
+                <div class="download-table">
+                    <a href="{{ file }}" download>Ссылка</a>
+                </div>
+
                 <table class="product-table">
                     <tr class="product-row table-header">
                         <th class="product-info cell-name">Название</th>
@@ -41,8 +64,8 @@
                     </tr>
 
                     {% for dict_item in products %}
-                        <tr class="product-row">
-                            <td class="product-info cell-name">{{ dict_item.name }}</td>
+                        <tr class="product-row" data-category="{{ dict_item.category }}" data-brand="{{ dict_item.brand }}">
+                            <td class="product-info cell-name" title="{{ dict_item.name }}">{{ dict_item.name }}</td>
                             <td class="product-info cell-price">₽{{ dict_item.price }}</td>
                             <td class="product-info cell-rating">{{ dict_item.rating }} / 5</td>
                             <td class="product-info cell-review">{{ dict_item.reviews }}</td>
@@ -62,5 +85,8 @@
             </div>
         </div>
     </div>
+    <script>
+
+    </script>
 {% endblock %}
 

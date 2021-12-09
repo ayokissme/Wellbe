@@ -18,8 +18,8 @@ class ProductsSearching:
         else:
             products_list = list(best_products.items())
             result = []
-            categories = []
-            brands = []
+            categories = {}
+            brands = {}
             for product in products_list:
                 product_info = df.loc[product[0]]
                 product_category = []
@@ -31,27 +31,36 @@ class ProductsSearching:
                     continue
 
                 try:
-                    product_category = product_info['category'].replace(', ', '_').split(',')
-                    [categories.append(e.replace('_', ', ')) for e in product_category if e.replace('_', ', ') not in categories]
-                    product_category = [e.replace('_', ', ') for e in product_category]
+                    name_replace = product_info['category'].replace(', ', '_')
+                    for name in set(name_replace.split(',')):
+                        name = name.replace('_', ', ')
+                        product_category.append(name)
+                        if name not in categories.keys():
+                            categories[name] = 1
+                        else:
+                            categories[name] += 1
                 except Exception:
                     pass
                 try:
                     brand = product_info['brand']
-                    if brand not in brands:
-                        brands.append(brand)
+                    if brand not in brands.keys():
+                        brands[brand] = 1
+                    else:
+                        brands[brand] += 1
                 except Exception:
                     pass
 
                 result.append({
-                    'name': product[0],
+                    'name': product[0].replace(', ', '_').replace(',', ', ').replace('_', ', '),
                     'price': product_info['price'],
                     'rating': product_info['rating'],
                     'reviews': product_info['reviews_count'],
                     'link': product_info['link'],
-                    'category': product_category,
+                    'category': "|".join(product_category),
                     'brand': product_info['brand'],
                 })
+            brands = [(k, brands[k]) for k in sorted(brands, key=brands.get, reverse=True)]
+            categories = [(k, categories[k]) for k in sorted(categories, key=categories.get, reverse=True)]
             return result, categories, brands
 
     @staticmethod
@@ -68,7 +77,7 @@ class ProductsSearching:
         if df_info is False:
             return None
         else:
-            filtered_df = df_info.drop(['brand', 'category', 'size_type', 'link', 'stock_status'], axis=1)
+            filtered_df = df_info.drop(['brand', 'category', 'size_type', 'link', 'stock_status', 'rating'], axis=1)
             products = OrderedDict()
             for product in filtered_df.index:
                 prod = filtered_df.loc[product, :]
@@ -101,14 +110,6 @@ class ProductsSearching:
             elif names_ratio[2] is False and categories_ratio[2] is True:
                 return categories_ratio[0], 'category'
             else:
-                # ratios_dict = {
-                #     names_ratio[0]: lev.ratio(self.user_request.lower(), names_ratio[0].lower()),
-                #     categories_ratio[0]: lev.ratio(self.user_request.lower(), categories_ratio[0].lower())
-                # }
-
-                # a = self.calculate_category_ratio(self.user_request, categories=ratios_dict)
-                # print(a, '-' * 8)
-                # print(ratios_dict)
                 print(names_ratio, categories_ratio)
 
                 if names_ratio[1] >= categories_ratio[1]:
@@ -238,7 +239,7 @@ class ProductsSearching:
 dirname = os.path.dirname(__file__)
 df = pd.read_csv(os.path.join(dirname, 'products.csv'), index_col='name')
 
-train_data = df.drop(['brand', 'category', 'size_type', 'link', 'stock_status'], axis=1)
+train_data = df.drop(['brand', 'category', 'size_type', 'link', 'stock_status', 'rating'], axis=1)
 
 X = pd.DataFrame(train_data.drop(['reviews_count'], axis=1))
 y = pd.DataFrame(train_data['reviews_count'])

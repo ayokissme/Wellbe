@@ -1,0 +1,16 @@
+{% block filter %}
+    <div class="filter-section">
+        <h1 style="font-size: 24px">{% block filter-name %}{% endblock %}</h1>
+        <ul class="filter-list">
+            {% for e in {% block a %}{% endblock %} %}
+                <li class="filter-item">
+                    <label for="Filter{{ e }}">
+                        <input id="Filter{{ e }}" type="checkbox">
+                        <span class="checkmark"></span>
+                        <div class="item-text" title="{{ e }}">{{ e }}</div>
+                    </label>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}

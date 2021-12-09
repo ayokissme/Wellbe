@@ -11,7 +11,8 @@ def index(request):
         brands = result[2]
         if products is None:
             return render(request, 'main/search-no-results.html', {"searchName": search_query})
-        return render(request, 'main/search.html', {"searchName": search_query, "products": products, "categories": categories, "brands": brands})
+
+        return render(request, 'main/search.html', {"searchName": search_query, "products": products, "categories": categories, "brands": brands, "file": 0})
     else:
         return render(request, 'main/index.html')
 

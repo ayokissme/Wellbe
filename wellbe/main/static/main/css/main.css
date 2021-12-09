@@ -23,6 +23,10 @@ body, h1, h2, h3, h4, h5, h6 {
     clear: both;
 }
 
+.hidden {
+    display: none;
+}
+
 /* Header */
 .header {
     margin-bottom: 30px;
@@ -111,6 +115,7 @@ input:focus::placeholder {
 }
 
 .filter-products-container {
+    display: flex;
     margin: 10px 0;
     width: 100%;
 }
@@ -134,7 +139,12 @@ input:focus::placeholder {
     padding: 10px;
     min-height: 400px;
     height: auto;
-    width: 83%;
+    /*width: auto;*/
+}
+
+.product-table {
+    width: auto;
+    border-collapse: collapse;
 }
 
 .table-header {
@@ -143,19 +153,17 @@ input:focus::placeholder {
     font-weight: bold;
 }
 
-.product-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
 .product-row {
     height: 40px;
+    max-height: 80px;
     line-height: 25px;
+
     overflow: hidden;
 }
 
 .cell-name {
-    width: 45%;
+    width: 40%;
+    min-width: 250px;
 }
 
 .cell-price, .cell-rating, .cell-review {
@@ -165,7 +173,7 @@ input:focus::placeholder {
 
 .cell-link {
     vertical-align: middle;
-    width: 25%;
+    width: 20%;
 }
 
 .cell-link a {
@@ -236,15 +244,29 @@ input:focus::placeholder {
 
 /* Filter */
 .filter-column {
-    float: left;
+    display: block;
     padding: 10px 0;
-    min-height: 400px;
     height: auto;
     width: 17%;
+    min-width: 230px;
 }
 
 .filter-section {
     padding-bottom: 10px;
+}
+
+.price-range {
+    margin: 15px 0;
+}
+
+.price-input {
+    padding: 10px;
+    margin-right: 10px;
+    width: 80px;
+    height: 30px;
+    border: 1px solid rgba(133, 133, 133, 0.25);
+    border-radius: 8px;
+    font-size: 14px;
 }
 
 .filter-list {
@@ -267,10 +289,6 @@ input:focus::placeholder {
     cursor: pointer;
 }
 
-.filter-item input {
-    cursor: pointer;
-}
-
 .item-text {
     position: relative;
     top: -18px;
@@ -281,50 +299,60 @@ input:focus::placeholder {
     text-overflow: ellipsis;
 }
 
-.filter-item input {
-    visibility: hidden;
+[data-count]::before {
+    content: "(" attr(data-count) ")";
+    color: #8c8c8c;
+    padding-left: 4px;
+    position: relative;
+    background-color: #fff;
+    float: right;
 }
 
 /* Checkmark */
 .checkmark {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 20px;
-  width: 20px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 20px;
+    width: 20px;
     border: 1px solid rgba(133, 133, 133, 0.25);
     border-radius: 20%;
-  background-color: #fff;
+    background-color: #fff;
+}
+
+.filter-item input {
+    visibility: hidden;
+    cursor: pointer;
 }
 
 .filter-item label:hover input ~ .checkmark {
-  background-color: rgba(204, 204, 204, 0.5);
+    background-color: rgba(204, 204, 204, 0.5);
 }
 
 .filter-item input:checked ~ .checkmark {
-  background-color: #A3D0C3;
+    background-color: #A3D0C3;
 }
 
 .checkmark:after {
-  content: "";
-  position: absolute;
-  display: none;
+    content: "";
+    position: absolute;
+    display: none;
 }
 
 .filter-item input:checked ~ .checkmark:after {
-  display: block;
+    display: block;
 }
 
 .filter-item .checkmark:after {
-  left: 7px;
-  top: 2px;
-  width: 7px;
-  height: 12px;
-  border: solid white;
-  border-width: 0 3px 3px 0;
-  -webkit-transform: rotate(45deg);
-  -ms-transform: rotate(45deg);
-  transform: rotate(45deg);
+    left: 7px;
+    top: 2px;
+    width: 7px;
+    height: 12px;
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
 }
 
 /* No-results page */
@@ -364,4 +392,18 @@ input:focus::placeholder {
 .footer-main {
     position: absolute;
     bottom: 0;
+}
+
+@media (max-width: 1250px) {
+    .cell-name {
+        width: 30%;
+    }
+
+    .cell-price, .cell-rating, .cell-review {
+        width: 50px;
+    }
+
+    .cell-link {
+        width: 20%;
+    }
 }
