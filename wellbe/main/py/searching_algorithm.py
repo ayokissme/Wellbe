@@ -9,6 +9,8 @@ import Levenshtein as lev
 class ProductsSearching:
     def __init__(self, user_request):
         self.user_request = user_request
+        a = 1
+        b = 2
         # print(8 * '-' + self.user_request + 8 * '-', end='\n')
 
     def return_products(self):
