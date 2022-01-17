@@ -1,11 +1,36 @@
 import scrapy
+from scrapy.crawler import CrawlerProcess
+import mysql.connector
 
 
 class ProductSpider(scrapy.Spider):
     name = 'products'
     start_urls = ['https://ru.iherb.com/c/vitamins']
+    db = ...
+
+    def start_requests(self):
+        try:
+            self.db = mysql.connector.connect(
+                host="localhost",
+                user="root",
+                passwd="2002",
+            )
+
+            with self.db.cursor() as cursor:
+                cursor.execute('use wellbe;')
+                cursor.execute('delete from category')
+                cursor.execute('delete from product')
+                cursor.execute('ALTER TABLE product AUTO_INCREMENT=1;')
+                self.db.commit()
+
+            print('successfully')
+            for link in self.start_urls:
+                yield scrapy.Request(link, callback=self.parse)
+        except Exception as e:
+            print(e)
 
     def parse(self, response, **kwargs):
+        print(response)
         for product in response.css('div.product-cell-container'):
             product_link = product.css('a.product-link::attr(href)').get()
             yield response.follow(product_link, callback=self.parse_product)
@@ -15,25 +40,24 @@ class ProductSpider(scrapy.Spider):
             next_page = response.urljoin(next_page)
             yield scrapy.Request(next_page, callback=self.parse)
 
-    @staticmethod
-    def parse_product(response):
+    def parse_product(self, response):
         product_details = response.css('div.product-detail-container')
         name = None
         category = None
         brand = None
         price = None
-        aver_rating = None
+        rating = None
         reviews_count = None
         stock_status = None
-        product_size = None
-        product_size_type = None
+        size = None
+        size_type = None
         # description = None
         link = None
 
         for detail in product_details:
             try:
-                name = detail.xpath('//*[@id="name"]').get().split('\n')[1]
-                name = [e.strip().replace(' ', ' ') for e in name.split(', ')]
+                name = detail.xpath('//*[@id="name"]').get().split('\n')[1].strip()
+                # name = [e.strip().replace(' ', ' ') for e in name.split(', ')]
             except Exception:
                 pass
 
@@ -54,16 +78,16 @@ class ProductSpider(scrapy.Spider):
                     brand = bread_crumbs.css('a.last:nth-child(2)::text').get()
                 else:
                     brand = list(name)[0]
-                category = [e.replace(' ', ' ') for e in bread_crumbs.css('a::text').getall() if e != brand and e != 'Категории' and e != 'Бренды А-Я']
+                category = set([e.replace(' ', ' ') for e in bread_crumbs.css('a::text').getall() if e != brand and e != 'Категории' and e != 'Бренды А-Я'])
             except Exception:
                 pass
 
             try:
-                rating = detail.css('a.stars::attr(title)').get().split('-')
-                aver_rating = rating[0].split('/')[0]
-                reviews_count = rating[1].split()[0]
+                rating_tag = detail.css('a.stars::attr(title)').get().split('-')
+                rating = rating_tag[0].split('/')[0]
+                reviews_count = rating_tag[1].split()[0]
             except Exception:
-                aver_rating = 0
+                rating = 0
                 reviews_count = 0
 
             try:
@@ -81,8 +105,8 @@ class ProductSpider(scrapy.Spider):
                     text = str(detail.css(f'#product-specs-list > li:nth-child({i})::text').get())
                     if 'Количество в упаковке' in text:
                         text = text.split(':')[1].strip().split()
-                        product_size = text[0]
-                        product_size_type = ' '.join(text[1::])
+                        size = text[0]
+                        size_type = ' '.join(text[1::])
                         break
             except Exception:
                 pass
@@ -93,16 +117,28 @@ class ProductSpider(scrapy.Spider):
             # except Exception:
             #     pass
 
-            yield {
-                'name': name,
-                'category': category,
-                'brand': brand,
-                'price': price,
-                'rating': aver_rating,
-                'reviews_count': reviews_count,
-                'stock_status': stock_status,
-                'size': product_size,
-                'size_type': product_size_type,
-                # 'description': description,
-                'link': link,
-            }
+            try:
+                with self.db.cursor(buffered=True) as cursor:
+
+                    print(f'insert into product (name, brand, price, rating, reviews_count, stock_status, size, size_type, link) '
+                          f'values ("{name}", "{brand}", {price}, {rating}, {reviews_count}, {stock_status}, {size}, "{size_type}", "{link}");')
+                    cursor.execute('use wellbe;')
+                    cursor.execute('insert into product (name, brand, price, rating, reviews_count, stock_status, size, size_type, link) '
+                                   f'values ("{name}", "{brand}", {price}, {rating}, {reviews_count}, {stock_status}, {size}, "{size_type}", "{link}");')
+                    cursor.execute(f'select id from product where name = "{name}" limit 1')
+                    product_id = cursor.fetchone()[0]
+                    print(product_id)
+                    for cat in category:
+                        cursor.execute('insert into category (name, product_id) '
+                                       f'values ("{cat}", {product_id});')
+                    self.db.commit()
+            except Exception as e:
+                print('#' * 50 + '\n')
+                print(e, '-' * 20)
+                print('\n' + '#' * 50)
+
+
+class StartSpider:
+    process = CrawlerProcess()
+    process.crawl(ProductSpider)
+    process.start()

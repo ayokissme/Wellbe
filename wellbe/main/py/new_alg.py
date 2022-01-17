@@ -1,3 +1,4 @@
+import mysql.connector
 import operator
 import os
 from collections import OrderedDict
@@ -11,95 +12,10 @@ class ProductsSearching:
         print(8 * '-' + user_request + 8 * '-', end='\n')
 
         self.user_request = user_request
-        self.get_best_products()
 
-    def return_products(self):
-        best_products = self.get_best_products()
-        if best_products is None:
-            return None
-        else:
-            products_list = list(best_products.items())
-            result = []
-            categories = {}
-            brands = {}
-            for product in products_list:
-                product_info = df.loc[product[0]]
-                product_category = []
-                prod_shape = product_info.shape
-
-                """ Вывод продуктов с одинаковыми именами """
-                if prod_shape[0] > 1 and len(prod_shape) > 1:
-                    # print(prod_shape)
-                    continue
-
-                try:
-                    name_replace = product_info['category'].replace(', ', '_')
-                    for name in set(name_replace.split(',')):
-                        name = name.replace('_', ', ')
-                        product_category.append(name)
-                        if name not in categories.keys():
-                            categories[name] = 1
-                        else:
-                            categories[name] += 1
-                except Exception:
-                    pass
-                try:
-                    brand = product_info['brand']
-                    if brand not in brands.keys():
-                        brands[brand] = 1
-                    else:
-                        brands[brand] += 1
-                except Exception:
-                    pass
-
-                result.append({
-                    'name': product[0].replace(', ', '_').replace(',', ', ').replace('_', ', '),
-                    'price': product_info['price'],
-                    'rating': product_info['rating'],
-                    'reviews': product_info['reviews_count'],
-                    'link': product_info['link'],
-                    'category': "|".join(product_category),
-                    'brand': product_info['brand'],
-                })
-            brands = [(k, brands[k]) for k in sorted(brands, key=brands.get, reverse=True)]
-            categories = [(k, categories[k]) for k in sorted(categories, key=categories.get, reverse=True)]
-            return result, categories, brands
-
-    @staticmethod
-    def is_digit(string):
-        try:
-            float(string)
-            return True
-        except ValueError:
-            return False
-
-    def get_best_products(self):
-        df_info = self.__filter_database()
-
-        if df_info is False:
-            return None
-        else:
-            filtered_df = df_info.drop(['brand', 'category', 'size_type', 'link', 'stock_status', 'rating'], axis=1)
-            products = OrderedDict()
-            for product in filtered_df.index:
-                prod = filtered_df.loc[product, :]
-                try:
-                    prod = prod.to_frame().T
-                except Exception:
-                    pass
-                products[product] = reg.predict(prod.drop(['reviews_count'], axis=1))[0][0]
-            return dict(sorted(products.items(), key=operator.itemgetter(1), reverse=True))
-
-    def __filter_database(self):
-        product_info = self.__get_product_info()
-        if product_info is False:
-            return False
-        else:
-            # print(df.loc[df[product_info[1]].str.contains(product_info[0], na=False)])
-            return df.loc[df[product_info[1]].str.contains(product_info[0], na=False)]
-
-    def __get_product_info(self):
-        names_ratio = self.get_names(df.index)
+    def get_product_info(self):
+        # names_ratio = self.get_names(df.index)
+        names_ratio = self.get_names()
         categories_ratio = self.get_categories(self.user_request)
         if names_ratio[2] is False and categories_ratio[2] is False:
             brands_ratio = self.get_brands(self.user_request)
@@ -120,16 +36,21 @@ class ProductsSearching:
                 else:
                     return categories_ratio[0], 'category'
 
-    def get_names(self, column):
+    def get_names(self):
+        global df
+        column = df['name']
         user_request = self.user_request
         ratios = {}
         brands_name_dict = {}
         categories_name_dict = {}
+
         for cell_name in column:
+
             if type(cell_name) is float:
                 continue
 
-            cell_split = cell_name.replace(', ', '').strip().split(',')
+            cell_split = cell_name.strip().split(', ')
+            # cell_split = cell_name.replace(', ', '').strip().split(',')
 
             brand = cell_split[0]
             brand_ratio = lev.ratio(brand.lower(), user_request.lower())
@@ -145,12 +66,11 @@ class ProductsSearching:
             ratios |= categories_name_dict
         try:
             max_ratio = max(ratios, key=ratios.get)
-
             if max_ratio in brands_name_dict:
-                return df.loc[max_ratio]['brand'], ratios[max_ratio], True, 'brand'
+                return df.loc[df['name'] == max_ratio]['brand'].item(), ratios[max_ratio], True, 'brand'
 
             elif max_ratio in categories_name_dict:
-                ratio_dict = self.calculate_category_ratio(user_request=user_request, categories=df.loc[max_ratio]['category'].split(','))
+                ratio_dict = self.calculate_category_ratio(user_request=user_request, categories=df.loc[df['name'] == max_ratio]['category'].item().split(','))
                 max_cat_ratio = max(ratio_dict, key=ratio_dict.get)
                 return max_cat_ratio, ratios[max_ratio], True, 'category'
             else:
@@ -176,13 +96,15 @@ class ProductsSearching:
             return '', 0, False
 
     @staticmethod
-    def calculate_category_ratio(
-            user_request,
-            ratios=None,
-            categories=pd.read_csv(os.path.join(os.path.dirname(__file__), 'iherb_categories.csv'),
-                                   index_col='category').index,
-            product_name=None,
-            coefficient=2):
+    def calculate_category_ratio(user_request,
+                                 ratios=None,
+                                 categories=None,
+                                 product_name=None,
+                                 coefficient=2):
+
+        if categories is None:
+            categories = pd.read_csv(os.path.join(os.path.dirname(__file__), 'iherb_categories.csv'), index_col='category').index
+
         if ratios is None:
             ratios = {}
         split_request = user_request.lower().split()
@@ -205,8 +127,6 @@ class ProductsSearching:
                         else:
                             new_ratios[category] = category_ratio
 
-            # if a == 1:
-            #     print(new_ratios)
             if len(new_ratios) != 0 and new_ratios[category] <= coefficient * len(split_request):
                 max_ratio = max(new_ratios, key=new_ratios.get)
                 ratios[name_strip] = new_ratios[max_ratio]
@@ -214,7 +134,9 @@ class ProductsSearching:
 
     @staticmethod
     def get_brands(user_request):
-        brand_df = pd.read_csv(os.path.join(os.path.dirname(__file__), 'iherb_brands.csv'), index_col='brand').index
+        global df
+        # brand_df = pd.read_csv(os.path.join(os.path.dirname(__file__), 'iherb_brands.csv'), index_col='brand').index
+        brand_df = df['brand']
         ratios = {}
         for brand in brand_df:
             brand_ratio = lev.ratio(user_request.lower(), brand.lower())
@@ -238,12 +160,49 @@ class ProductsSearching:
         return user_request
 
 
-dirname = os.path.dirname(__file__)
-df = pd.read_csv(os.path.join(dirname, 'products.csv'), index_col='name')
+db = mysql.connector.connect(
+    host="localhost",
+    user="root",
+    passwd="2002",
+)
 
-train_data = df.drop(['brand', 'category', 'size_type', 'link', 'stock_status', 'rating'], axis=1)
+try:
+    with db.cursor(buffered=True) as cursor:
+        cursor.execute('use wellbe;')
+        df = pd.read_sql('select * from product', db, index_col='id')
+
+        cursor.execute('select id from product')
+        product_id = [e[0] for e in cursor.fetchall()]
+        for new_id in product_id:
+            cursor.execute(f'select name from category where product_id = {new_id}')
+            categories2 = set([e[0] for e in cursor.fetchall()])
+            df = df.assign(category=','.join(categories2))
+            df.loc[new_id, 'name'] = df.loc[new_id, 'name'].strip()
+        cursor.close()
+except Exception as e:
+    print(e)
+
+
+def calculate_linear_regression():
+    global df
+    new_df = df.drop(['brand', 'category', 'size_type', 'link', 'stock_status', 'rating', 'name', 'Y'], axis=1)
+
+    with db.cursor() as cur:
+        for prod_id in new_df.index:
+            prod = new_df.loc[prod_id, :]
+            try:
+                prod = prod.to_frame().T
+            except Exception:
+                pass
+            cur.execute(f'update product set Y = {reg.predict(prod.drop(["reviews_count"], axis=1))[0][0]} where id = {prod_id};')
+            db.commit()
+        cur.close()
+
+
+train_data = df.drop(['brand', 'category', 'size_type', 'link', 'stock_status', 'rating', 'name', 'Y'], axis=1)
 
 X = pd.DataFrame(train_data.drop(['reviews_count'], axis=1))
 y = pd.DataFrame(train_data['reviews_count'])
 
 reg = LinearRegression().fit(X, y)
+# calculate_linear_regression()
