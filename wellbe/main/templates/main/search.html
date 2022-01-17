@@ -3,6 +3,11 @@
 {% block title %}Поиск - {{ searchName }}{% endblock %}
 
 {% block content %}
+
+    {% for e in a %}
+        {{ e.size }}
+    {% endfor %}
+
     <div class="container">
         <div class="sub-header">
             <h1>Результаты поиска "{{ searchName }}"</h1>
@@ -23,8 +28,8 @@
                     <ul class="filter-list">
                         {% for e in categories %}
                             <li class="filter-item">
-                                <label for="Filter{{ e.0 }}">
-                                    <input class="cardCheckBox" id="Filter{{ e.0 }}" type="checkbox" value="{{ e.0 }}">
+                                <label>
+                                    <input class="cardCheckBox" name="category" type="checkbox" value="{{ e.0 }}">
                                     <span class="checkmark"></span>
                                     <div class="item-text" title="{{ e.0 }}" data-count="{{ e.1 }}">{{ e.0 }}</div>
                                 </label>
@@ -38,7 +43,7 @@
                         {% for e in brands %}
                             <li class="filter-item">
                                 <label for="Filter{{ e.0 }}">
-                                    <input class="cardCheckBox2" id="Filter{{ e.0 }}" type="checkbox" value="{{ e.0 }}">
+                                    <input class="cardCheckBox" name="brand" type="checkbox" value="{{ e.0 }}">
                                     <span class="checkmark"></span>
                                     <div class="item-text" title="{{ e.0 }}" data-count="{{ e.1 }}">{{ e.0 }}</div>
                                 </label>
@@ -64,7 +69,7 @@
                     </tr>
 
                     {% for dict_item in products %}
-                        <tr class="product-row" data-category="{{ dict_item.category }}" data-brand="{{ dict_item.brand }}">
+                        <tr class="product-row">
                             <td class="product-info cell-name" title="{{ dict_item.name }}">{{ dict_item.name }}</td>
                             <td class="product-info cell-price">₽{{ dict_item.price }}</td>
                             <td class="product-info cell-rating">{{ dict_item.rating }} / 5</td>

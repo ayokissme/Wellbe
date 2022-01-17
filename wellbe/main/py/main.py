@@ -1,4 +1,5 @@
-from searching_algorithm import ProductsSearching
+# from searching_algorithm import ProductsSearching
+from new_alg import ProductsSearching
 import pandas as pd
 import os
 
@@ -9,11 +10,7 @@ import os
 # ProductsSearching('Pure Essence')
 # ProductsSearching('витамины для женщин')
 
-d = {'col1': [1, 2], 'col2': [3, 4]}
-
-df = pd.DataFrame(data=d).to_csv('new.csv')
-print(df)
-
+print(ProductsSearching('мультивитамины для детей').get_product_info())
 
 # def create_csv():
 #     df = pd.read_csv('wellbe/main/py/data/products.csv')['brand']

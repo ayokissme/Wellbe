@@ -13,6 +13,19 @@ body, h1, h2, h3, h4, h5, h6 {
     max-width: 1430px;
 }
 
+.container-main {
+    padding-top: 50px;
+    text-align: center;
+}
+
+.container.container-main h1 {
+    font-size: 62px;
+}
+
+.container.container-main p {
+    font-size: 22px;
+}
+
 .clearfix {
     display: block;
 }
